@@ -238,16 +238,16 @@ This section describes the minimum functionality we expect your implementation t
    * The [wiki](https://en.wikipedia.org/wiki/JSON)
    * The [rfc](https://tools.ietf.org/rfc/rfc8259.txt)
 
-3. (35 points total) Implement all [basic filters](https://stedolan.github.io/jq/manual/#Basicfilters).  
+3. (37 points total) Implement all [basic filters](https://stedolan.github.io/jq/manual/#Basicfilters).  
    In particular:  
    1. (0 points) Identity filter `.`, which returns an object given to it.
    2. (1 point) Parenthesis '()', used for grouping operations.
    3. (4 points) Object indexing, both identifier `.field` and generic `.["field"]`.  
       If the field doesn't exist, running the filter should return `null`.
    4. (3 points) Optional object indexing `.field?` (and `.["field"]?`), which doesn't rise an exception if the value indexed into isn't an object.
-   5. (3 points) Array index and slice `.[0]`, `.[0:10]`.  
+   5. (4 points) Array index and slice `.[0]`, `.[0:10]`.  
      Slices behave very similarly to Python or Go.
-   6. (5 points) Array/Object Value Iterator `.[]`, `.[1,2,3]`.  
+   6. (6 points) Array/Object Value Iterator `.[]`, `.[1,2,3]`.  
      When applied to an array, the `.[]` filter iterates over its elements, and when applied on an object it iterates over its values (*not* over the keys).
      `.[1,2,3]` returns an iterator which goes over the first, second and third elements.
    7. (4 points) Optional counterparts for indexing, slicing and iterators.
@@ -258,14 +258,14 @@ This section describes the minimum functionality we expect your implementation t
    
    *Hint*. for each basic filter, add a constructor to the `Filter` type in `src/Jq/Filters.hs`, then define parser for it in `src/Jq/CParser.hs`, and interpret the filter into Haskell code by adding a case to the `compile` function in `src/Jq/Compiler.hs`
 
-4. (20 points total) Value constructors  
-   1. (7 points) Simple value constructors.  
+4. (23 points total) Value constructors  
+   1. (9 points) Simple value constructors.  
      `jq` allows you to construct values from the input elements:
      `echo '1' | jq '{"this" : [.]}'` (this produces `{"this": [1]})`), or ignoring them:
       `echo 'null' | jq '{"this" : [42]}'` (this produces `{"this": [42]})`).
       For this task you're asked to implement only the "simple" ones: numbers, booleans, strings, arrays without iteration (`[1,2,.field]`, not `[.[]]`), objects
-   2. (13 points) More complex value constructors  
-      This is complementary to the previous subtask -- implement the constructors for arrays (for example `[.items[].name]`, objects (for example `{user: .user, title: .title}`).
+   2. (14 points) More complex value constructors  
+      This is complementary to the previous subtask -- implement the constructors for arrays (for example `[.items[].name]`, objects (for example `{user}`).
       Be warned that this part is harder than it seems and some features interact in a non-obvious way, and not every aspect of behaviour is described precisely in the documentation.
       In case of doubt, you can experiment with the reference implementation and follow what it does.
 
