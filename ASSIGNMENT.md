@@ -331,7 +331,8 @@ The latter is already available as `Parsing.Parsing` module.
 1. Clone repository [https://gitlab.tudelft.nl/bliesnikov/jq-clone/](https://gitlab.tudelft.nl/bliesnikov/jq-clone/). 
 2. Put your name and email in `JqClone.cabal`.
 3. Run `stack build` to build your project and `stack install` to install the `jq-clone` executable.
-4. To run your implementation use `echo <input.json> | jq-clone -- <filter>`
+4. To run your implementation use `echo "<your-input>" | jq-clone "<your-filter>"` or `echo "<your-input>" | stack run -- "<your-filter>"`  
+   Usage of quotation marks is platform-specific: on Windows only `"` is allowed, while on *nix both `'` and `"` work.
 
 ### Testing
 
