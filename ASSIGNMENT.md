@@ -244,6 +244,8 @@ This section describes the minimum functionality we expect your implementation t
    2. (1 point) Parenthesis '()', used for grouping operations.
    3. (4 points) Object indexing, both identifier `.field` and generic `.["field"]`.  
       If the field doesn't exist, running the filter should return `null`.
+      In this case "generic" means for all field names, as opposed to "identifier-like".
+      For fully generic field access look at the first one of the advanced tasks.
    4. (3 points) Optional object indexing `.field?` (and `.["field"]?`), which doesn't rise an exception if the value indexed into isn't an object.
    5. (4 points) Array index and slice `.[0]`, `.[0:10]`.  
      Slices behave very similarly to Python or Go.
@@ -280,6 +282,11 @@ but the total grade is capped at 100%. Please note that the tasks in this
 section require the basic functionality from the previous section to be already
 implemented, so it does not make sense to start on these advanced features
 before you are confident in your implementation of the basic part.
+
+* (3 points) Generic indexing with filters.  
+  A more general counterpart for object and array indexing, allowing arbitrary filters and iterators in the brackets.
+  For example: `echo '{"this" : ["that"], "that" : 1}' | jq '.[.this[]]'`, which returns `1`.  
+  In order for this subtask to count your implementation should handle all JSON values, have all basic filters, and all object constructors.
 
 * (5 points) [Recursive descent operator](https://stedolan.github.io/jq/manual/#RecursiveDescent:..) `..` iterates over all sub-values of the current value, including itself.
   For example, `echo [{"a" : 1}] | jq '..'` results in
