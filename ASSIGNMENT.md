@@ -286,6 +286,7 @@ before you are confident in your implementation of the basic part.
 * (3 points) Generic indexing with filters.  
   A more general counterpart for object and array indexing, allowing arbitrary filters and iterators in the brackets.
   For example: `echo '{"this" : ["that"], "that" : 1}' | jq '.[.this[]]'`, which returns `1`.  
+  To keep this assignment independent from one with comparison operators below, you are asked to implement indexing with arbitrary filters, which output either numbers/iterators or strings.  
   In order for this subtask to count your implementation should handle all JSON values, have all basic filters, and all object constructors.
 
 * (5 points) [Recursive descent operator](https://stedolan.github.io/jq/manual/#RecursiveDescent:..) `..` iterates over all sub-values of the current value, including itself.
