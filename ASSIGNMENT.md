@@ -251,7 +251,7 @@ This section describes the minimum functionality we expect your implementation t
      Slices behave very similarly to Python or Go.
    6. (6 points) Array/Object Value Iterator `.[]`, `.[1,2,3]`.  
      When applied to an array, the `.[]` filter iterates over its elements, and when applied on an object it iterates over its values (*not* over the keys).
-     `.[1,2,3]` returns an iterator which goes over the first, second and third elements.
+     `.[0,1,2]` returns an iterator which goes over the first, second and third elements.
    7. (4 points) Optional counterparts for indexing, slicing and iterators.
    8. (7 points) Comma operator `op1 , op2`.  
      Returns results of both `op1` and `op2` akin to iterator elements.
