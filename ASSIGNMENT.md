@@ -294,16 +294,14 @@ before you are confident in your implementation of the basic part.
 
   ```json
   [
-    [
-      {
-        "a": 1
-      }
-    ],
     {
       "a": 1
-    },
-    1
+    }
   ]
+  {
+    "a": 1
+  }
+  1
   ```
   In order for this subtask to count your implementation should handle all JSON and have all basic filters.
 
