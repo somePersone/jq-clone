@@ -18,6 +18,7 @@ compile (Parenthesis f) inp = compile f inp
 compile (ArrayIndex _) JNull = return [JNull]
 compile (ArrayIndex n) (JArray a) =  return [a !! getIndex n a] 
 
+compile (ObjectIndex _) JNull = return [JNull]
 compile (ObjectIndex k) (JObject kv) =  return (case kv Map.!? k of
 						 Nothing -> [JNull]
 						 Just a -> [a])
