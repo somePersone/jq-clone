@@ -2,9 +2,9 @@ module Jq.JParser where
 
 import Parsing.Parsing
 import Jq.Json
-
 import Jq.SParser
 import Jq.KParser   
+import qualified Data.Map as Map
 
 parseJNull :: Parser JSON
 parseJNull = do _ <- string "null"
@@ -58,7 +58,7 @@ parseJObject :: Parser JSON
 parseJObject = do _ <- symbol "{"
                   kvs <- keyValues <|> return []
                   _ <- symbol "}"
-                  return (JObject kvs)
+                  return (JObject (Map.fromList kvs))
 
 keyValues :: Parser [(String, JSON)]
 keyValues =  do kv <- keyValue

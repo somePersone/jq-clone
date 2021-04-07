@@ -18,17 +18,19 @@ data Filter = Identity
             | IfThenElse Filter Filter Filter
             | RecursiveDecent
             | Opperation Opp Filter Filter
-            -- | EqualToo Filter Filter
-            -- | NotEqualToo Filter Filter
-            -- | LargerThan Filter Filter
-            -- | LargerEqualThan Filter Filter
-            -- | SmallerThan Filter Filter
-            -- | SmallerEqualThan Filter Filter
+	    | Comparisons Comp Filter Filter
 
 data Opp = Add
          | Sub
-         | Mult
+         | Mul
          | Div
+
+data Comp = Equal
+	  | NotEqual
+	  | LessThan
+	  | LessThanEqual
+	  | GreaterThan
+	  | GreaterThanEqual
 
 
 data ObjectItem = StringValue String Filter
@@ -58,21 +60,22 @@ instance Show Filter where
   show (IfThenElse i t e) = "If " ++ show i ++ " then " ++ show t ++ " else " ++ show e 
   show RecursiveDecent = ".."
   show (Opperation o l r) = show l ++ show o ++ show r
-
-  -- show (EqualToo l r) = show l ++ " == " ++ show r
-  -- show (NotEqualToo l r) = show l ++ " != " ++ show r
-  -- show (LargerThan l r) = show l ++ " > " ++ show 
-  -- show (LargerEqualThan l r) = show l ++ " >= " ++ show r
-  -- show (SmallerThan l r) = show l ++ " < " ++ show r
-  -- show (SmallerEqualThan l r) = show l ++ " <= " ++ show r
+  show (Comparisons c l r) = show l ++ show c ++ show r
 
 
 instance Show Opp where
   show Add = " + "
   show Sub = " - "
-  show Mult = " * "
+  show Mul = " * "
   show Div = " / "
 
+instance Show Comp where
+  show Equal = " == "
+  show NotEqual = " != "
+  show LessThan = " < "
+  show LessThanEqual = " <= "
+  show GreaterThan = " > "
+  show GreaterThanEqual = " >= "
   
 instance Show ObjectItem where
   show (StringValue s f) = show s ++ ":" ++ show f

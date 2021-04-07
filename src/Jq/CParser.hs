@@ -151,42 +151,22 @@ parseOperation f = do
   let o = case s of
             '+' -> Add 
             '-' -> Sub
-            '*' -> Mult
+            '*' -> Mul
             '/' -> Div
   Opperation o f <$> fill  
 
--- parseEqualToo :: Filter -> Parser Filter
--- parseEqualToo f = do
---   _ <- symbol "=="
---   EqualToo f <$> fill
 
--- parseNotEqualToo :: Filter -> Parser Filter
--- parseNotEqualToo f = do
---   _ <- symbol "!="
---   NotEqualToo f <$> fill
-
--- parseLargerThan :: Filter -> Parser Filter
--- parseLargerThan f = do
---   _ <- symbol ">"
---   LargerThan f <$> fill
-
--- parseLargerEqualThan :: Filter -> Parser Filter
--- parseLargerEqualThan f = do
---   _ <- symbol ">="
---   LargerEqualThan f <$> fill
-
--- parseSmallerThan :: Filter -> Parser Filter
--- parseSmallerThan f = do
---   _ <- symbol "<"
---   SmallerThan f <$> fill
-
--- parseSmallerEqualThan :: Filter -> Parser Filter
--- parseSmallerEqualThan f = do
---   _ <- symbol "<="
---   SmallerEqualThan f <$> fill
-
--- equalities :: Filter -> Parser Filter
--- equalities f = parseEqualToo f <|> parseNotEqualToo f <|> parseLargerThan f <|> parseLargerEqualThan f <|> parseSmallerThan f <|> parseSmallerEqualThan f
+parseComparisons :: Filter -> Parser Filter   
+parseComparisons f = do
+  s <-  (symbol "==") <|> (symbol "!=" ) <|> (symbol "<=" ) <|> (symbol ">=" ) <|> (symbol "<" )  <|> (symbol ">" ) 
+  let c = case s of
+            "==" -> Equal 
+	    "!=" -> NotEqual
+	    "<" -> LessThan
+	    "<=" -> LessThanEqual
+	    ">" -> GreaterThan
+	    ">=" -> GreaterThanEqual
+  Comparisons c f <$> fill  
 
 fill :: Parser Filter
 fill = parseRecursiveDecent  
@@ -203,7 +183,7 @@ fill = parseRecursiveDecent
       <|> parseObject 
       <|> parseRecursiveDecent
       >>= \f ->
-        parseOperation f <|> return f
+        parseOperation f <|> parseComparisons f <|> return f
 
 commas :: Parser Filter
 commas = do

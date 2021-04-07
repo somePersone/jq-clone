@@ -4,6 +4,7 @@ import           Jq.Filters
 import           Jq.Json
 import           Jq.CompareJS
 import           Jq.Opperations
+import qualified Data.Map as Map
 
 
 
@@ -18,9 +19,9 @@ compile (Parenthesis f) inp = compile f inp
 compile (ArrayIndex _) JNull = return [JNull]
 compile (ArrayIndex n) (JArray a) =  return [a !! getIndex n a] 
 
-compile (ObjectIndex k) (JObject kv) =  return [case lookup k kv of 
-    Nothing -> JNull
-    Just j -> j]
+compile (ObjectIndex k) (JObject kv) =  return (case kv Map.!? k of
+						 Nothing -> [JNull]
+						 Just a -> [a])
 
 
 compile (ArraySlice _ _) JNull = return [JNull]
@@ -28,11 +29,13 @@ compile (ArraySlice n m) (JArray a) = return [JArray[a !! x | x <- getIndexs n m
 compile (ArraySlice n m) (JString a) = return [JString [a !! x | x <- getIndexs n m a, x < length a]]
 
 compile ItterateAll (JArray as) = return as
-compile ItterateAll (JObject kvs) = return (map snd kvs)
+compile ItterateAll (JObject m) = return (Map.elems m)
 
 compile (ItterateSelect _) JNull = return [JNull]
 compile (ItterateSelect ns) (JArray as) = return [as !! getIndex x as | x <- ns, x < length as]
-compile (ItterateSelect ns) (JObject kvs) = return [snd (kvs !! getIndex x kvs) | x <- ns, x < length kvs]
+compile (ItterateSelect ns) (JObject m) = return (do
+	n <- ns
+	return (snd (Map.elemAt n m)))
 
 compile (Optional f) inp = case compile f inp of 
                             Left _ -> return []
@@ -47,7 +50,7 @@ compile (Value json) _ = return [json]
 compile (Array f) inp = (:[]) . JArray <$> compile f inp
 
 compile RecursiveDecent (JArray js) = (JArray js :) <$>  (concat <$> traverse (compile RecursiveDecent) js)
-compile RecursiveDecent (JObject kvs) = (JObject kvs :) <$>  (concat <$> traverse (compile RecursiveDecent . snd) kvs)
+compile RecursiveDecent (JObject m) = (JObject m :) <$>  (concat <$> traverse (compile RecursiveDecent) (Map.elems m))
 compile RecursiveDecent a = return [a]
 
 compile (Opperation o l r) inp = case (compile l inp, compile r inp) of
@@ -57,45 +60,24 @@ compile (Opperation o l r) inp = case (compile l inp, compile r inp) of
                                     (_, Left s) -> Left s
                                     (_, _) -> Left "More then 1 opp"
 
--- compile (EqualToo l r) inp = case compileAndComper l r inp of
---   (Right (COM EQ)) -> Right [JBool True]
---   (Right _) -> Right [JBool False]
---   (Left s) -> Left s
-
--- compile (NotEqualToo l r) inp = case compileAndComper l r inp of
---   (Right (COM EQ)) -> Right [JBool False]
---   (Right _) -> Right [JBool True]
---   (Left s) -> Left s
-
--- compile (SmallerThan l r) inp = case compileAndComper l r inp of
---   Right (COM LT) -> Right [JBool True]
---   Right _ -> Right [JBool False]
---   Left s -> Left s
-
--- compile (SmallerEqualThan l r) inp = case compileAndComper l r inp of
---   Right (COM LT) -> Right [JBool True]
---   Right (COM EQ) -> Right [JBool True]
---   Right _ -> Right [JBool False]
---   Left s -> Left s
-
--- compile (LargerThan l r) inp = case compileAndComper l r inp of
---   Right (COM GT) -> Right [JBool True]
---   Right _ -> Right [JBool False]
---   Left s -> Left s
-
--- compile (LargerEqualThan l r) inp = case compileAndComper l r inp of
---   Right (COM GT) -> Right [JBool True]
---   Right (COM EQ) -> Right [JBool True]
---   Right _ -> Right [JBool False]
---   Left s -> Left s     
-
-
+compile (Comparisons c l r) inp = case (compile l inp, compile r inp) of
+                                    (Right [left], Right [right]) -> return [JBool (case c of
+						Equal -> left == right
+						NotEqual -> left /= right
+						LessThan -> left < right
+						LessThanEqual -> left <= right
+						GreaterThan -> left > right
+						GreaterThanEqual -> left >= right)]
+                                    (Left s, Left s1) -> Left (s ++ s1)
+                                    (Left s, _) -> Left s
+                                    (_, Left s) -> Left s
+                                    (_, _) -> Left "More then 1 value"
 
 compile (Object as) inp = 
     do 
     oiss <- traverse com as
     let xss = foldr combineLists [[]] oiss :: [[(String, JSON)]]
-    return (JObject <$> xss)
+    return (JObject . Map.fromList <$> xss)
   where
       combineLists :: [a] -> [[a]] -> [[a]]
       combineLists xs bss = bss >>= \bs -> xs >>= \x -> [x:bs]
@@ -117,7 +99,7 @@ compile (Object as) inp =
 compile (IfThenElse i t e) inp = case compile i inp of
                                     Right [JBool True] -> compile t inp
                                     Right [JBool False] -> compile e inp
-                                    Right _ -> Left "ivalid predicate for if"
+                                    Right _ -> Left "invalid predicate for if"
                                     Left s -> Left s        
 
 compile _ _ = Left "Error"
