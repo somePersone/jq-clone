@@ -10,21 +10,33 @@ data JSON = JNull
           | JObject (Map.Map String JSON)
       
 instance Show JSON where
-  show JNull = "null" 
-  show (JBool True ) = "true"
-  show (JBool False) = "false"
-  show (JNum n) = if fromInteger i == n then show i else show n
-    where
-      i = round n :: Integer
-  show (JString s) = "\"" ++ s ++ "\""
-  show (JArray []) = "[]"   
-  show (JArray a) = show a
-  show (JObject m) = "{" ++ showKvs (Map.assocs m) ++ "}"
+  show x = showWithIndent 0 x
 
-showKvs :: [(String, JSON)] -> String 
-showKvs [] = []
-showKvs [(s, j)] = show (JString s) ++ ": " ++ show j ++ ""
-showKvs ((s, j): kvs) = show (JString s) ++ ": " ++ show j ++ ", " ++ showKvs kvs
+showWithIndent :: Int -> JSON -> String
+showWithIndent n JNull = "null" 
+showWithIndent n (JBool True) = "true"
+showWithIndent n (JBool False) = "false"
+showWithIndent n (JNum x) = if fromInteger i == x then show i else show x
+  where
+    i = round x :: Integer
+showWithIndent n (JString s) = "\"" ++ s ++ "\""
+showWithIndent n (JArray []) = "[]"   
+showWithIndent n (JArray a) = "[\n" ++ showArryElem (n + 1) a ++ indent n ++ "]"
+showWithIndent n (JObject m) | Map.null m = "{}"
+			     | otherwise = "{\n" ++ showKvs (n + 1) (Map.assocs m) ++ indent n ++ "}"
+
+showArryElem :: Int -> [JSON] -> String
+showArryElem _ [] = []
+showArryElem n [a] = indent n ++ showWithIndent n a ++ "\n"
+showArryElem n (a:as) = indent n ++ showWithIndent n a ++ ",\n" ++ showArryElem n as
+
+showKvs :: Int ->  [(String, JSON)] -> String 
+showKvs n [] = []
+showKvs n [(s, j)] = indent n ++ showWithIndent n (JString s) ++ ": " ++ showWithIndent n j ++ "\n"
+showKvs n ((s, j): kvs) = indent n ++ showWithIndent n (JString s) ++ ": " ++ showWithIndent n j ++ ",\n" ++ showKvs n kvs
+
+indent :: Int -> String
+indent n = take (2 * n) (repeat ' ')
 
 instance Eq JSON where 
   JNull == JNull = True 
