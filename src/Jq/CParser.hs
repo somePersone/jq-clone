@@ -142,6 +142,12 @@ parseRecursiveDecent = do
   _ <- string ".."
   return RecursiveDecent    
 
+parseNot :: Parser Filter
+parseNot = do
+  _ <- symbol "not"
+  return Not
+
+
 parseOperation :: Filter -> Parser Filter   
 parseOperation f = do
   s <-  (token . char $ '+') 
@@ -158,7 +164,7 @@ parseOperation f = do
 
 parseComparisons :: Filter -> Parser Filter   
 parseComparisons f = do
-  s <-  (symbol "==") <|> (symbol "!=" ) <|> (symbol "<=" ) <|> (symbol ">=" ) <|> (symbol "<" )  <|> (symbol ">" ) 
+  s <-  (symbol "==") <|> (symbol "!=" ) <|> (symbol "<=" ) <|> (symbol ">=" ) <|> (symbol "<" )  <|> (symbol ">" ) <|> (symbol "and") <|> (symbol "or")
   let c = case s of
             "==" -> Equal 
 	    "!=" -> NotEqual
@@ -166,6 +172,8 @@ parseComparisons f = do
 	    "<=" -> LessThanEqual
 	    ">" -> GreaterThan
 	    ">=" -> GreaterThanEqual
+	    "and" -> And
+	    "or" -> Or
   Comparisons c f <$> fill  
 
 fill :: Parser Filter
@@ -182,6 +190,7 @@ fill = parseRecursiveDecent
       <|> parseValue
       <|> parseObject 
       <|> parseRecursiveDecent
+      <|> parseNot
       >>= \f ->
         parseOperation f <|> parseComparisons f <|> return f
 

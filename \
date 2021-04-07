@@ -102,8 +102,7 @@ compile (Object as) inp =
 
 
 compile (IfThenElse i t e) inp = case compile i inp of
-                                    Right [j] -> if truthy j then compile t inp else compile e inp
-				    Right _ -> Left "More then one predicate"
+                                    Right j -> if truthy j then compile t inp else compile e inp
                                     Left s -> Left s        
 
 compile _ _ = Left "Error"

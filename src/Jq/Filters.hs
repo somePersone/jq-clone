@@ -19,6 +19,7 @@ data Filter = Identity
             | RecursiveDecent
             | Opperation Opp Filter Filter
 	    | Comparisons Comp Filter Filter
+	    | Not
 
 data Opp = Add
          | Sub
@@ -31,6 +32,8 @@ data Comp = Equal
 	  | LessThanEqual
 	  | GreaterThan
 	  | GreaterThanEqual
+	  | And
+	  | Or
 
 
 data ObjectItem = StringValue String Filter
@@ -61,6 +64,7 @@ instance Show Filter where
   show RecursiveDecent = ".."
   show (Opperation o l r) = show l ++ show o ++ show r
   show (Comparisons c l r) = show l ++ show c ++ show r
+  show Not = "not"
 
 
 instance Show Opp where
@@ -76,6 +80,8 @@ instance Show Comp where
   show LessThanEqual = " <= "
   show GreaterThan = " > "
   show GreaterThanEqual = " >= "
+  show And = " and "
+  show Or = " or "
   
 instance Show ObjectItem where
   show (StringValue s f) = show s ++ ":" ++ show f

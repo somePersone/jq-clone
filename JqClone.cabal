@@ -62,7 +62,6 @@ library
                        Jq.Parser
                        Jq.SParser
                        Jq.KParser
-                       Jq.CompareJS
                        Jq.Opperations
 
   -- Other library packages from which modules are imported.
