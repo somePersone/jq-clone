@@ -50,10 +50,10 @@ hexToUnicode :: Char -> Char -> Char -> Char -> Char
 hexToUnicode = (((toEnum .) .) .) .  hexToInt 
 
 escape :: Parser String 
-escape = do _ <- char '\\'
-            x <- item 
+escape = do b <- char '\\'
+            x <- char '\"' <|> char '\\' <|> char '/' <|> char 'b' <|> char 'f' <|> char 'n' <|> char 'r' <|> char 't'
             xs <- pString
-            return (x:xs)   
+            return (b:x:xs)   
 
 closeString :: Parser String 
 closeString = do _ <- char '\"'
@@ -61,5 +61,7 @@ closeString = do _ <- char '\"'
 
 basicChar :: Parser String 
 basicChar = do x <- item 
-               xs <- pString
-               return (x:xs)
+	       if x /= '\\' then do
+              	 xs <- pString
+                 return (x:xs)
+			    else error "Invalid escape"
