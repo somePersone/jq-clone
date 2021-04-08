@@ -10,9 +10,11 @@ pString :: Parser String
 pString = unicode <|> escape <|> closeString <|> basicChar 
                  
 unicode :: Parser String
-unicode = do _ <- string "\\u"
+unicode = do _ <- char '\\'
+	     _ <- char 'u'
 	     v <- pure hexToUnicode <*> alphanum <*> alphanum <*> alphanum <*> alphanum
-	     return(v: [])
+	     xs <- pString
+	     return(v: xs)
 	     
 
 digitToInt :: Char -> Int
